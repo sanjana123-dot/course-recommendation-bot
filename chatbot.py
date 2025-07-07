@@ -23,11 +23,16 @@ class CourseChatbot:
             rag_system: Instance of CourseRAGSystem
         """
         self.rag_system = rag_system
-        self.api_key = os.getenv("GEMINI_API_KEY", "")
+               
+        # Try to get API key from Streamlit secrets first, then environment variables
+        try:
+            self.api_key = st.secrets["GEMINI_API_KEY"]
+        except:
+            self.api_key = os.getenv("GEMINI_API_KEY", "")
         
         if not self.api_key:
             logger.error("GEMINI_API_KEY not found in environment variables")
-            raise ValueError("GEMINI_API_KEY is required")
+            raise ValueError("GEMINI_API_KEY is required. Please add it to Streamlit Cloud secrets or your .env file")
         
         try:
             self.client = genai.Client(api_key=self.api_key)
